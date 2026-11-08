@@ -5,7 +5,7 @@ import { markerState, vacancy } from '../../../shared/rules';
 import { api, errorMessage } from '../lib/api';
 import { LIVE_EVENTS, useLive, useNow } from '../lib/live';
 import { useLang } from '../lib/LangContext';
-import { schoolName } from '../lib/i18n';
+import { schoolAddress, schoolName } from '../lib/i18n';
 import StatusBadge from '../components/StatusBadge';
 import ApplicationRow from '../components/ApplicationRow';
 
@@ -78,7 +78,7 @@ export default function TeacherPage() {
         <div>
           <h1>{schoolName(school, lang)}</h1>
           <p className="muted small">
-            {school.address} · {t.classrooms(school.classrooms)}
+            {schoolAddress(school, lang)} · {t.classrooms(school.classrooms)}
           </p>
         </div>
         <StatusBadge marker={marker} />

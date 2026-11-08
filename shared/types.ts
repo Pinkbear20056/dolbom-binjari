@@ -1,4 +1,4 @@
-/** Shared domain types for 돌봄빈자리. Used by server, web, and rule tests. */
+/** Shared domain types for 돌봄. Used by server, web, and rule tests. */
 
 /** Whether a school accepts applications. Decided by the school, never computed. */
 export type SchoolStatus = 'closed' | 'check' | 'open';
@@ -16,6 +16,8 @@ export interface School {
   name: string;
   nameEn: string;
   address: string;
+  /** Romanised road address for the English UI. */
+  addressEn: string;
   /** Number of afternoon-care classrooms (public data). */
   classrooms: number;
   /** capacity = classrooms × 20 (sample assumption). */

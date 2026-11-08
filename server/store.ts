@@ -17,12 +17,25 @@ export interface StoreOptions {
   seed: () => Db;
 }
 
+/** Fields added after the first release. A db.json without them is from an older seed and is replaced. */
+const REQUIRED_SCHOOL_FIELDS = ['nameEn', 'addressEn', 'waitlistNoteEn'] as const;
+
+function hasCurrentSchoolShape(school: unknown): boolean {
+  if (school === null || typeof school !== 'object') return false;
+  const record = school as Record<string, unknown>;
+  return REQUIRED_SCHOOL_FIELDS.every((field) => typeof record[field] === 'string');
+}
+
 function readFile(filePath: string): Db | null {
   try {
     if (!fs.existsSync(filePath)) return null;
     const raw = fs.readFileSync(filePath, 'utf8');
     const parsed = JSON.parse(raw) as Partial<Db>;
     if (!Array.isArray(parsed.schools) || !Array.isArray(parsed.applications) || !Array.isArray(parsed.bundles)) {
+      return null;
+    }
+    if (!parsed.schools.every(hasCurrentSchoolShape)) {
+      console.warn(`[store] ${filePath} was written by an older seed; re-seeding`);
       return null;
     }
     return parsed as Db;

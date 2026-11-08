@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { School } from '../../../shared/types';
 import { markerState, vacancy } from '../../../shared/rules';
 import { useLang } from '../lib/LangContext';
-import { actionLabel, schoolName } from '../lib/i18n';
+import { actionLabel, schoolAddress, schoolName } from '../lib/i18n';
 import StatusBadge from './StatusBadge';
 import ApplyForm from './ApplyForm';
 
@@ -36,7 +36,7 @@ export default function SchoolDetail({ school, homeSchool, defaultGrade, now, on
             {schoolName(school, lang)}
             {isHome && <span className="chip chip-home">{t.mySchool}</span>}
           </h2>
-          <p className="muted">{school.address}</p>
+          <p className="muted">{schoolAddress(school, lang)}</p>
           <StatusBadge marker={marker} size="lg" />
 
           <dl className="detail-stats">

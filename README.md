@@ -1,4 +1,4 @@
-# 돌봄빈자리 (Dolbom Binjari) — spare after-school care seats, shared between neighbouring schools
+# 돌봄 (Dolbom) — spare after-school care seats, shared between neighbouring schools
 
 > **Sample data.** Every headcount, status and application in this demo is invented. School names, addresses and classroom counts are public data; nothing else is real. See [Data](#data-and-sources).
 
@@ -41,7 +41,7 @@ Colour is never the only cue: the label text is always shown next to the marker 
 
 ### Languages
 
-The UI is **English by default** with a **한국어** toggle in the header (the choice is kept in the browser). Every screen, marker label, button and error is translated; school names switch between the Korean and English forms. Server error messages are Korean and are mapped to English on the client by error code (`web/src/lib/i18n.ts`).
+The UI is **English by default** with a **한국어** toggle in the header (the choice is kept in the browser). Every screen, marker label, button and error is translated; school names and addresses switch between the Korean and romanised forms. Server error messages are Korean and are mapped to English on the client by error code (`web/src/lib/i18n.ts`).
 
 ## Run it (Windows PowerShell)
 

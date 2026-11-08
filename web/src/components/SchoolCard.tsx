@@ -1,7 +1,7 @@
 import type { School } from '../../../shared/types';
 import { markerState, vacancy } from '../../../shared/rules';
 import { useLang } from '../lib/LangContext';
-import { schoolName } from '../lib/i18n';
+import { schoolAddress, schoolName } from '../lib/i18n';
 import StatusBadge from './StatusBadge';
 
 interface SchoolCardProps {
@@ -30,7 +30,7 @@ export default function SchoolCard({ school, isHome, isSelected, now, onSelect }
         </h3>
         <StatusBadge marker={marker} />
       </div>
-      <p className="school-card-address">{school.address}</p>
+      <p className="school-card-address">{schoolAddress(school, lang)}</p>
       <dl className="school-card-stats">
         <div>
           <dt>{t.capacity}</dt>

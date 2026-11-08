@@ -1,5 +1,5 @@
 /**
- * Pure business rules for 돌봄빈자리. No I/O, no framework imports.
+ * Pure business rules for 돌봄. No I/O, no framework imports.
  * Every function returns new objects and never mutates its inputs.
  */
 import type { Application, ApplicationKind, Db, NewApplicationInput, School } from './types';

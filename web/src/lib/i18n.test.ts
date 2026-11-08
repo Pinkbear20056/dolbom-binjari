@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_LANG, LANGS, apiErrorText, isLang, messages, otherLang, schoolName, shortSchoolName } from './i18n';
+import { DEFAULT_LANG, LANGS, apiErrorText, isLang, messages, otherLang, schoolAddress, schoolName, shortSchoolName } from './i18n';
 import { createSeed } from '../../../shared/seed';
 
 function keysOf(obj: Record<string, unknown>, prefix = ''): string[] {
@@ -53,6 +53,19 @@ describe('i18n dictionaries', () => {
     expect(schoolName(cheongam, 'en')).toBe('Cheongam Elementary');
     expect(shortSchoolName(cheongam, 'ko')).toBe('청암초');
     expect(shortSchoolName(cheongam, 'en')).toBe('Cheongam');
+  });
+
+  it('shows the romanised address in English and the Korean address in Korean', () => {
+    const [cheongam] = createSeed().schools;
+    expect(schoolAddress(cheongam, 'ko')).toBe('경기 파주시 청암로 16');
+    expect(schoolAddress(cheongam, 'en')).toBe('16 Cheongam-ro, Paju-si, Gyeonggi-do');
+    for (const s of createSeed().schools) expect(s.addressEn).not.toMatch(/[가-힣]/);
+  });
+
+  it('brands the app as 돌봄 / Dolbom', () => {
+    expect(messages.ko.brand).toBe('돌봄');
+    expect(messages.en.brand).toBe('Dolbom');
+    expect(messages.en.title.startsWith('Dolbom ·')).toBe(true);
   });
 
   it('translates known API error codes in English and keeps the server message in Korean', () => {

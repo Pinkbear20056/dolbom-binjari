@@ -18,8 +18,8 @@ export function otherLang(lang: Lang): Lang {
 }
 
 const en = {
-  title: 'Dolbom Binjari · Spare daycare seats in nearby schools',
-  brand: 'Dolbom Binjari',
+  title: 'Dolbom · Spare daycare seats in nearby schools',
+  brand: 'Dolbom',
   sectionParent: 'Parents',
   sectionTeacher: 'Daycare',
   sampleData: 'Sample data',
@@ -181,8 +181,8 @@ const en = {
 export type Messages = typeof en;
 
 const ko: Messages = {
-  title: '돌봄빈자리 · 이웃 학교 돌봄교실 자리 연결',
-  brand: '돌봄빈자리',
+  title: '돌봄 · 이웃 학교 돌봄교실 자리 연결',
+  brand: '돌봄',
   sectionParent: '학부모 화면',
   sectionTeacher: '돌봄교실 화면',
   sampleData: '샘플 데이터',
@@ -319,6 +319,10 @@ export const messages: Record<Lang, Messages> = { en, ko };
 
 export function schoolName(school: Pick<School, 'name' | 'nameEn'>, lang: Lang): string {
   return lang === 'en' ? school.nameEn : school.name;
+}
+
+export function schoolAddress(school: Pick<School, 'address' | 'addressEn'>, lang: Lang): string {
+  return lang === 'en' ? school.addressEn : school.address;
 }
 
 /** Short form for map labels: 청암초 / Cheongam. */
