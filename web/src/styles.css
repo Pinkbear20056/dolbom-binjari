@@ -1,0 +1,57 @@
+:root {
+  --bg: #fff7ed;
+  --card: #ffffff;
+  --text: #292524;
+  --muted: #78716c;
+  --primary: #ea580c;
+  --primary-dark: #c2410c;
+  --radius: 18px;
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+}
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.sample-banner {
+  background: #fde68a;
+  color: #422006;
+  font-weight: 700;
+  text-align: center;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+.page {
+  padding: 16px;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+}
+.btn {
+  display: inline-block;
+  padding: 14px 20px;
+  border-radius: 999px;
+  border: 0;
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
