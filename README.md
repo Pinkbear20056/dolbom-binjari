@@ -6,7 +6,7 @@
 
 | Parent (phone) | Teacher (PC / tablet) | Home |
 |---|---|---|
-| ![Parent screen: map of the bundle with coloured, labelled markers and school cards](../docs/screenshots/parent-map.jpg) | ![Teacher screen: four stat cards, headcount −/+, 3-way accepting status, application list](../docs/screenshots/teacher.jpg) | ![Home screen with parent and teacher entry points and the data-reset button](../docs/screenshots/home.jpg) |
+| ![Parent screen: map of the bundle with coloured, labelled markers and school cards](docs/screenshots/parent-map.jpg) | ![Teacher screen: four stat cards, headcount −/+, 3-way accepting status, application list](docs/screenshots/teacher.jpg) | ![Home screen with parent and teacher entry points and the data-reset button](docs/screenshots/home.jpg) |
 
 ## The problem
 
@@ -125,7 +125,7 @@ Events: `schools:changed`, `applications:changed`, `db:reset`.
 
 - **Public:** school names, addresses and the number of afternoon-care classrooms come from the Gyeonggi Provincial Office of Education, *2026 온동네 돌봄·교육 자원지도* (Paju edition). Capacity is assumed as classrooms × 20.
 - **Invented for the demo:** current headcounts, accepting statuses, every application, every name (e.g. 김하늘) and phone number (010-0000-0000). No real child or guardian data exists anywhere in this repository.
-- **Coordinates:** OpenStreetMap Nominatim. 파주와동초등학교 is listed in OSM as "와동초등학교"; see `docs/TODO.md`.
+- **Coordinates:** OpenStreetMap Nominatim. 파주와동초등학교 is listed in OSM as "와동초등학교" (37.726425, 126.7570207), about 150 m from its road address — the one coordinate still to be confirmed by a human; edit `shared/seed.ts` and press "데이터 초기화" to change it.
 - Map tiles: © OpenStreetMap contributors. No API keys are used.
 
 Two bundles are seeded: **운정 가까운 학교 묶음** (청암초 full, 가온초 check, 파주와동초 open, 지산초 full) and **문산 묶음** (문산초 open). A 운정 parent never sees 문산초 — that is the bundle filter at work.
