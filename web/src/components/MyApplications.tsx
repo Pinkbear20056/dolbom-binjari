@@ -1,14 +1,16 @@
 import type { Application, School } from '../../../shared/types';
+import { useLang } from '../lib/LangContext';
+import { schoolName } from '../lib/i18n';
 
 interface MyApplicationsProps {
   applications: Application[];
   schools: School[];
 }
 
-const STATUS_LABEL: Record<Application['status'], { text: string; cls: string }> = {
-  pending: { text: '접수 중 · Pending', cls: 'app-pending' },
-  approved: { text: '승인 · Approved', cls: 'app-approved' },
-  rejected: { text: '반려 · Rejected', cls: 'app-rejected' },
+const STATUS_CLASS: Record<Application['status'], string> = {
+  pending: 'app-pending',
+  approved: 'app-approved',
+  rejected: 'app-rejected',
 };
 
 function formatTime(iso: string): string {
@@ -17,26 +19,31 @@ function formatTime(iso: string): string {
 }
 
 export default function MyApplications({ applications, schools }: MyApplicationsProps) {
+  const { lang, t } = useLang();
   if (applications.length === 0) {
-    return <p className="muted">아직 보낸 신청이 없습니다. 학교를 골라 신청하거나 문의해 보세요.</p>;
+    return <p className="muted">{t.noMyApps}</p>;
   }
   const sorted = [...applications].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   return (
     <ul className="my-apps" aria-live="polite">
       {sorted.map((a) => {
         const school = schools.find((s) => s.id === a.schoolId);
-        const st = STATUS_LABEL[a.status];
         return (
-          <li key={a.id} className={`my-app ${st.cls}`}>
+          <li key={a.id} className={`my-app ${STATUS_CLASS[a.status]}`}>
             <div className="my-app-head">
-              <strong>{school?.name ?? a.schoolId}</strong>
-              <span className="my-app-status">{st.text}</span>
+              <strong>{school ? schoolName(school, lang) : a.schoolId}</strong>
+              <span className="my-app-status">{t.status[a.status]}</span>
             </div>
             <p className="muted small">
-              {a.kind === 'apply' ? '신청' : '문의'} · {a.childName} · {a.grade}학년 · {formatTime(a.createdAt)}
+              {a.kind === 'apply' ? t.kindApply : t.kindInquiry} · {a.childName} · {t.grade(a.grade)} · {formatTime(a.createdAt)}
             </p>
-            {a.status === 'rejected' && a.rejectReason && <p className="my-app-reason">반려 사유: {a.rejectReason}</p>}
-            {a.status === 'approved' && <p className="my-app-ok">자리가 배정되었습니다. 학교 안내에 따라 등원 준비를 해 주세요.</p>}
+            {a.status === 'rejected' && a.rejectReason && (
+              <p className="my-app-reason">
+                {t.rejectReasonPrefix}
+                {a.rejectReason}
+              </p>
+            )}
+            {a.status === 'approved' && <p className="my-app-ok">{t.approvedNote}</p>}
           </li>
         );
       })}

@@ -1,4 +1,5 @@
 import type { Application, Bundle, School, SchoolStatus } from '../../../shared/types';
+import { apiErrorText, type Lang } from './i18n';
 
 export class ApiError extends Error {
   code: string;
@@ -52,7 +53,10 @@ export const api = {
   reset: () => call<{ ok: boolean }>('/api/reset', { method: 'POST' }),
 };
 
-export function errorMessage(err: unknown): string {
+/** Human-readable error in the UI language. Accepts an Error, an ApiError, or an already-formatted string. */
+export function errorMessage(err: unknown, lang: Lang): string {
+  if (err instanceof ApiError) return apiErrorText(err.code, err.message, lang);
   if (err instanceof Error) return err.message;
-  return '알 수 없는 오류가 났습니다.';
+  if (typeof err === 'string') return err;
+  return apiErrorText('UNKNOWN', '', lang);
 }

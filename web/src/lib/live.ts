@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
-import { errorMessage } from './api';
 
 /** Event names emitted by the server (see server/app.ts EVENTS). */
 export const LIVE_EVENTS = {
@@ -19,7 +18,8 @@ export function getSocket(): Socket {
 
 export interface LiveState<T> {
   data: T | null;
-  error: string | null;
+  /** The raw error (ApiError or Error); format it with errorMessage(err, lang) in the UI. */
+  error: unknown;
   loading: boolean;
   reload: () => void;
 }
@@ -31,7 +31,7 @@ export interface LiveState<T> {
  */
 export function useLive<T>(fetcher: () => Promise<T>, events: readonly string[], cacheKey = ''): LiveState<T> {
   const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
   const [version, setVersion] = useState(0);
   const fetcherRef = useRef(fetcher);
@@ -53,7 +53,7 @@ export function useLive<T>(fetcher: () => Promise<T>, events: readonly string[],
         setError(null);
       })
       .catch((e: unknown) => {
-        if (!cancelled) setError(errorMessage(e));
+        if (!cancelled) setError(e);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

@@ -1,5 +1,7 @@
 import type { School } from '../../../shared/types';
 import { markerState, vacancy } from '../../../shared/rules';
+import { useLang } from '../lib/LangContext';
+import { schoolName } from '../lib/i18n';
 import StatusBadge from './StatusBadge';
 
 interface SchoolCardProps {
@@ -11,34 +13,35 @@ interface SchoolCardProps {
 }
 
 export default function SchoolCard({ school, isHome, isSelected, now, onSelect }: SchoolCardProps) {
+  const { lang, t } = useLang();
   const marker = markerState(school, now);
   const seats = vacancy(school);
   return (
     <button
       type="button"
-      className={`school-card card-${marker.color} ${isSelected ? 'is-selected' : ''}`}
+      className={`school-card ${isSelected ? 'is-selected' : ''}`}
       onClick={() => onSelect(school.id)}
       aria-pressed={isSelected}
     >
       <div className="school-card-head">
         <h3>
-          {school.name}
-          {isHome && <span className="chip chip-home">우리 학교</span>}
+          {schoolName(school, lang)}
+          {isHome && <span className="chip chip-home">{t.mySchool}</span>}
         </h3>
         <StatusBadge marker={marker} />
       </div>
       <p className="school-card-address">{school.address}</p>
       <dl className="school-card-stats">
         <div>
-          <dt>정원</dt>
-          <dd>{school.capacity}</dd>
+          <dt>{t.capacity}</dt>
+          <dd>{t.people(school.capacity)}</dd>
         </div>
         <div>
-          <dt>현재 인원</dt>
-          <dd>{school.current}</dd>
+          <dt>{t.current}</dt>
+          <dd>{t.people(school.current)}</dd>
         </div>
         <div>
-          <dt>정원상 빈자리</dt>
+          <dt>{t.seats}</dt>
           <dd className={seats > 0 ? 'num-good' : ''}>{marker.level === 'stale' ? '–' : seats}</dd>
         </div>
       </dl>

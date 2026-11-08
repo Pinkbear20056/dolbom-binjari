@@ -4,20 +4,23 @@ import type { Application, School, SchoolStatus } from '../../../shared/types';
 import { markerState, vacancy } from '../../../shared/rules';
 import { api, errorMessage } from '../lib/api';
 import { LIVE_EVENTS, useLive, useNow } from '../lib/live';
+import { useLang } from '../lib/LangContext';
+import { schoolName } from '../lib/i18n';
 import StatusBadge from '../components/StatusBadge';
 import ApplicationRow from '../components/ApplicationRow';
 
 const SCHOOL_EVENTS = [LIVE_EVENTS.schools, LIVE_EVENTS.reset];
 const APP_EVENTS = [LIVE_EVENTS.applications, LIVE_EVENTS.reset];
 
-const STATUS_OPTIONS: Array<{ value: SchoolStatus; label: string; labelEn: string; cls: string }> = [
-  { value: 'closed', label: '마감', labelEn: 'Closed', cls: 'seg-red' },
-  { value: 'check', label: '학교 확인 필요', labelEn: 'Check needed', cls: 'seg-yellow' },
-  { value: 'open', label: '신청 가능', labelEn: 'Open', cls: 'seg-green' },
+const STATUS_OPTIONS: Array<{ value: SchoolStatus; cls: string }> = [
+  { value: 'closed', cls: 'seg-red' },
+  { value: 'check', cls: 'seg-yellow' },
+  { value: 'open', cls: 'seg-green' },
 ];
 
 export default function TeacherPage() {
   const { schoolId = '' } = useParams();
+  const { lang, t } = useLang();
   const now = useNow();
   const schoolsLive = useLive(() => api.schools(), SCHOOL_EVENTS);
   const appsLive = useLive(() => api.schoolApplications(schoolId), APP_EVENTS, schoolId);
@@ -35,7 +38,7 @@ export default function TeacherPage() {
     try {
       await action();
     } catch (err) {
-      setError(errorMessage(err));
+      setError(errorMessage(err, lang));
     } finally {
       setBusy(false);
     }
@@ -45,7 +48,7 @@ export default function TeacherPage() {
     return (
       <main className="page">
         <p className="form-error" role="alert">
-          {schoolsLive.error}
+          {errorMessage(schoolsLive.error, lang)}
         </p>
       </main>
     );
@@ -54,9 +57,9 @@ export default function TeacherPage() {
     return (
       <main className="page">
         <Link to="/" className="back-link">
-          ← 홈
+          {t.backHome}
         </Link>
-        <p>{schoolsLive.loading ? '불러오는 중…' : `학교 "${schoolId}"를 찾을 수 없습니다.`}</p>
+        <p>{schoolsLive.loading ? t.loading : t.schoolNotFound(schoolId)}</p>
       </main>
     );
   }
@@ -72,91 +75,83 @@ export default function TeacherPage() {
   return (
     <main className="page teacher-page">
       <header className="page-head">
-        <Link to="/" className="back-link">
-          ← 홈
-        </Link>
         <div>
-          <h1>
-            {school.name} <span className="muted small">돌봄전담사 화면</span>
-          </h1>
-          <p className="muted small" style={{ margin: 0 }}>
-            {school.address} · 오후돌봄 교실 {school.classrooms}개
+          <h1>{schoolName(school, lang)}</h1>
+          <p className="muted small">
+            {school.address} · {t.classrooms(school.classrooms)}
           </p>
         </div>
+        <StatusBadge marker={marker} />
       </header>
 
-      <section className="stat-grid" aria-label="현황 숫자">
+      <section className="stat-grid" aria-label={t.statsAria}>
         <div className="stat">
-          <span className="stat-label">정원</span>
-          <strong>{school.capacity}</strong>
+          <span className="stat-label">{t.capacity}</span>
+          <strong>{t.people(school.capacity)}</strong>
         </div>
         <div className="stat">
-          <span className="stat-label">현재 인원</span>
-          <strong>{school.current}</strong>
+          <span className="stat-label">{t.current}</span>
+          <strong>{t.people(school.current)}</strong>
         </div>
         <div className={`stat ${seats > 0 ? 'stat-good' : ''}`}>
-          <span className="stat-label">정원상 빈자리</span>
-          <strong>{seats}</strong>
+          <span className="stat-label">{t.seats}</span>
+          <strong>{t.people(seats)}</strong>
         </div>
         <div className={`stat ${pending.length > 0 ? 'stat-attn' : ''}`}>
-          <span className="stat-label">접수 중 신청</span>
-          <strong>{pending.length}</strong>
+          <span className="stat-label">{t.toReview}</span>
+          <strong>{t.cases(pending.length)}</strong>
         </div>
       </section>
 
-      <section className="card">
-        <div className="teacher-row">
+      <section className="card teacher-settings">
+        <h2>{t.settingsTitle}</h2>
+        <p className="muted small">{t.settingsText}</p>
+
+        <div className="teacher-controls">
           <div>
-            <h2>학부모에게 보이는 상태</h2>
-            <StatusBadge marker={marker} size="lg" />
+            <h3>{t.enrolledTitle}</h3>
+            <div className="counter">
+              <button
+                type="button"
+                className="btn btn-ghost counter-btn"
+                aria-label={t.decAria}
+                disabled={busy || school.current <= 0}
+                onClick={() => run(() => api.updateSchool(school.id, { current: school.current - 1 }))}
+              >
+                −
+              </button>
+              <output className="counter-value" aria-live="polite">
+                {school.current} <span className="muted small">/ {school.capacity}</span>
+              </output>
+              <button
+                type="button"
+                className="btn btn-ghost counter-btn"
+                aria-label={t.incAria}
+                disabled={busy || school.current >= school.capacity}
+                onClick={() => run(() => api.updateSchool(school.id, { current: school.current + 1 }))}
+              >
+                +
+              </button>
+            </div>
           </div>
-        </div>
-        <p className="muted small">
-          정원상 빈자리는 자동 계산됩니다. 신청 가능 여부는 아래에서 학교가 직접 정합니다. 빈자리가 있어도 "신청 가능"으로 바꾸기 전에는
-          학부모에게 "학교 확인 필요"로 보입니다.
-        </p>
-
-        <h3>현재 인원</h3>
-        <div className="counter">
-          <button
-            type="button"
-            className="btn btn-ghost counter-btn"
-            aria-label="현재 인원 1 줄이기"
-            disabled={busy || school.current <= 0}
-            onClick={() => run(() => api.updateSchool(school.id, { current: school.current - 1 }))}
-          >
-            −
-          </button>
-          <output className="counter-value" aria-live="polite">
-            {school.current} <span className="muted small">/ {school.capacity}</span>
-          </output>
-          <button
-            type="button"
-            className="btn btn-ghost counter-btn"
-            aria-label="현재 인원 1 늘리기"
-            disabled={busy || school.current >= school.capacity}
-            onClick={() => run(() => api.updateSchool(school.id, { current: school.current + 1 }))}
-          >
-            +
-          </button>
-        </div>
-
-        <h3>신청 가능 여부</h3>
-        <div className="segmented" role="radiogroup" aria-label="신청 가능 여부">
-          {STATUS_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              role="radio"
-              aria-checked={school.status === opt.value}
-              className={`seg ${opt.cls} ${school.status === opt.value ? 'is-active' : ''}`}
-              disabled={busy}
-              onClick={() => run(() => api.updateSchool(school.id, { status: opt.value }))}
-            >
-              <span>{opt.label}</span>
-              <span className="seg-en">{opt.labelEn}</span>
-            </button>
-          ))}
+          <div>
+            <h3>{t.acceptingTitle}</h3>
+            <div className="segmented" role="radiogroup" aria-label={t.acceptingAria}>
+              {STATUS_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={school.status === opt.value}
+                  className={`seg ${opt.cls} ${school.status === opt.value ? 'is-active' : ''}`}
+                  disabled={busy}
+                  onClick={() => run(() => api.updateSchool(school.id, { status: opt.value }))}
+                >
+                  <span>{t.marker[opt.value]}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         {error && (
           <p className="form-error" role="alert">
@@ -167,10 +162,10 @@ export default function TeacherPage() {
 
       <section className="card">
         <h2>
-          신청 목록 <span className="muted small">접수 중 {pending.length} · 전체 {applications.length}</span>
+          {t.listTitle} <span className="muted small">{t.listSummary(pending.length, applications.length)}</span>
         </h2>
-        {appsLive.error && <p className="form-error">{appsLive.error}</p>}
-        {sortedApps.length === 0 && <p className="muted">아직 들어온 신청이 없습니다.</p>}
+        {appsLive.error != null && <p className="form-error">{errorMessage(appsLive.error, lang)}</p>}
+        {sortedApps.length === 0 && <p className="muted">{t.noApps}</p>}
         <ul className="app-list">
           {sortedApps.map((a) => (
             <ApplicationRow

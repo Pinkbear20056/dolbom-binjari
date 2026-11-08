@@ -1,9 +1,12 @@
+import { isLang, type Lang } from './i18n';
+
 /** localStorage helpers. Everything is per device; there is no login in this demo. */
 
 const KEYS = {
   myApplicationIds: 'dolbom.myApplicationIds',
   homeSchoolId: 'dolbom.homeSchoolId',
   grade: 'dolbom.grade',
+  lang: 'dolbom.lang',
 } as const;
 
 function read(key: string): string | null {
@@ -47,4 +50,9 @@ export const storage = {
     return Number.isInteger(g) && g >= 1 && g <= 6 ? g : null;
   },
   setGrade: (grade: number | null) => write(KEYS.grade, grade === null ? null : String(grade)),
+  getLang(): Lang | null {
+    const v = read(KEYS.lang);
+    return isLang(v) ? v : null;
+  },
+  setLang: (lang: Lang) => write(KEYS.lang, lang),
 };

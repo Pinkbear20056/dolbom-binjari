@@ -27,8 +27,9 @@ export interface School {
   lng: number | null;
   /** ISO timestamp of the last update by the school. */
   updatedAt: string;
-  /** Shown to parents of this school when it is full. */
+  /** Shown to parents of this school when it is full (Korean / English). */
   waitlistNote: string;
+  waitlistNoteEn: string;
 }
 
 export type ApplicationStatus = 'pending' | 'approved' | 'rejected';

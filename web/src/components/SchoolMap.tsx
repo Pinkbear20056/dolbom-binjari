@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap } from 'react-le
 import { latLngBounds, type LatLngBoundsExpression } from 'leaflet';
 import type { School } from '../../../shared/types';
 import { markerState, vacancy, type MarkerColor } from '../../../shared/rules';
+import { useLang } from '../lib/LangContext';
+import { markerLabel, shortSchoolName } from '../lib/i18n';
 
 const MARKER_FILL: Record<MarkerColor, string> = {
   grey: '#9ca3af',
@@ -39,6 +41,7 @@ function FitBounds({ points }: { points: Array<[number, number]> }) {
 }
 
 export default function SchoolMap({ schools, homeSchoolId, selectedId, now, onSelect }: SchoolMapProps) {
+  const { lang, t } = useLang();
   const located = useMemo(() => schools.filter((s) => s.lat !== null && s.lng !== null), [schools]);
   const center = useMemo<[number, number]>(() => {
     if (located.length === 0) return DEFAULT_CENTER;
@@ -52,7 +55,7 @@ export default function SchoolMap({ schools, homeSchoolId, selectedId, now, onSe
 
   return (
     <div className="map-wrap">
-      <MapContainer center={center} zoom={13} scrollWheelZoom={false} className="map" aria-label="묶음 안 학교 지도">
+      <MapContainer center={center} zoom={13} scrollWheelZoom={false} className="map" aria-label={t.mapAria}>
         <FitBounds points={points} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -76,19 +79,17 @@ export default function SchoolMap({ schools, homeSchoolId, selectedId, now, onSe
               eventHandlers={{ click: () => onSelect(s.id) }}
             >
               <Tooltip permanent direction="right" offset={[14, 0]} className={`map-label map-label-${marker.color}`}>
-                <strong>{s.name.replace('초등학교', '초')}</strong>
-                {isHome && <span className="map-home"> 우리 학교</span>}
+                <strong>{shortSchoolName(s, lang)}</strong>
+                {isHome && <span className="map-home">{t.mapHome}</span>}
                 <br />
-                {marker.label}
-                {marker.level !== 'stale' && ` · 빈자리 ${vacancy(s)}`}
+                {markerLabel(marker, lang)}
+                {marker.level !== 'stale' && t.mapSeats(vacancy(s))}
               </Tooltip>
             </CircleMarker>
           );
         })}
       </MapContainer>
-      {missing > 0 && (
-        <p className="map-note">좌표가 없는 학교 {missing}곳은 지도에 없고 아래 목록에만 있습니다.</p>
-      )}
+      {missing > 0 && <p className="map-note">{t.mapMissing(missing)}</p>}
     </div>
   );
 }

@@ -21,7 +21,7 @@ Do not build new facilities. **Connect the seats that already exist.**
 1. Group 4–5 nearby schools into a **bundle** (묶음).
 2. Show every school in the bundle on one map with its live care status.
 3. Let a parent apply only to schools **inside their bundle**.
-4. The receiving school's care coordinator (돌봄전담사) checks the school's own rules and **approves or rejects with a reason**.
+4. The receiving school's daycare (돌봄교실) staff check the school's own rules and **approve or reject with a reason**.
 
 One principle runs through the whole app:
 
@@ -38,6 +38,10 @@ One principle runs through the whole app:
 | 4 | status `open` | green | 신청 가능 / Open to apply | 신청하기 (apply) |
 
 Colour is never the only cue: the label text is always shown next to the marker and on every card.
+
+### Languages
+
+The UI is **English by default** with a **한국어** toggle in the header (the choice is kept in the browser). Every screen, marker label, button and error is translated; school names switch between the Korean and English forms. Server error messages are Korean and are mapped to English on the client by error code (`web/src/lib/i18n.ts`).
 
 ## Run it (Windows PowerShell)
 
@@ -77,7 +81,7 @@ Reset the demo at any time with **"데이터 초기화"** at the bottom of the h
 |---|---|---|
 | `/` | everyone | pitch, entry points, data reset |
 | `/parent` | parent on a phone | choose home school + grade → bundle map and cards → detail sheet → apply / inquire → "내 신청" live status |
-| `/teacher/:schoolId` | care coordinator | capacity / current / seats / pending counters, current −/+, 3-way accepting status, approve / reject with reason |
+| `/teacher/:schoolId` | school daycare (돌봄교실) | capacity / current / seats / pending counters, current −/+, 3-way accepting status, approve / reject with reason |
 
 Every change is broadcast over Socket.IO, so a decision on the teacher's screen appears on the parent's phone immediately.
 
@@ -102,7 +106,8 @@ app/
    ├─ src/pages/         HomePage, ParentPage, TeacherPage
    ├─ src/components/    SchoolMap (react-leaflet + OSM tiles), SchoolCard,
    │                     SchoolDetail, ApplyForm, MyApplications, ApplicationRow, StatusBadge
-   └─ src/lib/           api.ts (fetch), live.ts (Socket.IO refetch hook), storage.ts
+   └─ src/lib/           api.ts (fetch), live.ts (Socket.IO refetch hook), storage.ts,
+                         i18n.ts (EN/KO strings) + LangContext.tsx (language toggle)
 ```
 
 ### API
@@ -134,8 +139,8 @@ Two bundles are seeded: **운정 가까운 학교 묶음** (청암초 full, 가�
 
 This is a hackathon demo. Deliberately missing:
 
-- **No login.** Roles are URLs. A real system needs administrator authentication, per-school permissions for coordinators, and guardian identity verification.
-- **No policy engine.** Each school's rules (residency, grade limits, sibling priority, fees) are checked by the coordinator by hand. Encoding them would come later, with the education office.
+- **No login.** Roles are URLs. A real system needs administrator authentication, per-school permissions for daycare staff, and guardian identity verification.
+- **No policy engine.** Each school's rules (residency, grade limits, sibling priority, fees) are checked by the daycare staff by hand. Encoding them would come later, with the education office.
 - **Transport safety** between the home school and the host school (who walks the child, insurance, pickup) is out of scope here and is the first thing to design with schools.
 - **Storage** is a JSON file; fine for a demo, not for production.
 - **Bundles are hand-picked** in the seed. A real pilot would define them with the regional education office (교육지원청).
@@ -143,12 +148,13 @@ This is a hackathon demo. Deliberately missing:
 ## Tests
 
 ```
-Test Files  3 passed (3)
-     Tests  51 passed (51)
+Test Files  4 passed (4)
+     Tests  57 passed (57)
 ```
 
 - `shared/rules.test.ts` — marker priority, bundle filter, approve/reject, duplicate and out-of-bundle refusal, immutability
 - `shared/seed.test.ts` — capacity = classrooms × 20, timestamps, fake-only contact data
 - `server/app.test.ts` — every route, error codes, broadcast events
+- `web/src/lib/i18n.test.ts` — English default, EN/KO key parity, daycare wording, error-code mapping
 
 Map data © OpenStreetMap contributors (ODbL).
