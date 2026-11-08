@@ -6,7 +6,7 @@
 
 | Parent (phone) | Teacher (PC / tablet) | Home |
 |---|---|---|
-| ![Parent screen: map of the bundle with coloured, labelled markers and school cards](docs/screenshots/parent-map.jpg) | ![Teacher screen: four stat cards, headcount −/+, 3-way accepting status, application list](docs/screenshots/teacher.jpg) | ![Home screen with parent and teacher entry points and the data-reset button](docs/screenshots/home.jpg) |
+| ![Parent screen: map of the bundle with coloured, labelled markers and school cards](docs/screenshots/parent-map.jpg) | ![Daycare screen: four stat cards, headcount −/+, 3-way accepting status, one pending inquiry](docs/screenshots/teacher.jpg) | ![Home screen (English default, 한국어 toggle) with parent and daycare entry points](docs/screenshots/home.jpg) |
 
 ## The problem
 
@@ -130,7 +130,7 @@ Events: `schools:changed`, `applications:changed`, `db:reset`.
 
 - **Public:** school names, addresses and the number of afternoon-care classrooms come from the Gyeonggi Provincial Office of Education, *2026 온동네 돌봄·교육 자원지도* (Paju edition). Capacity is assumed as classrooms × 20.
 - **Invented for the demo:** current headcounts, accepting statuses, every application, every name (e.g. 김하늘) and phone number (010-0000-0000). No real child or guardian data exists anywhere in this repository.
-- **Coordinates:** OpenStreetMap Nominatim. 파주와동초등학교 is listed in OSM as "와동초등학교" (37.726425, 126.7570207), about 150 m from its road address — the one coordinate still to be confirmed by a human; edit `shared/seed.ts` and press "데이터 초기화" to change it.
+- **Coordinates:** OpenStreetMap Nominatim. 파주와동초등학교 is listed in OSM as "와동초등학교" (37.726425, 126.7570207), about 150 m from its road address — the one coordinate still to be confirmed by a human; edit `shared/seed.ts` and press "Reset sample data" to change it.
 - Map tiles: © OpenStreetMap contributors. No API keys are used.
 
 Two bundles are seeded: **운정 가까운 학교 묶음** (청암초 full, 가온초 check, 파주와동초 open, 지산초 full) and **문산 묶음** (문산초 open). A 운정 parent never sees 문산초 — that is the bundle filter at work.
@@ -148,13 +148,14 @@ This is a hackathon demo. Deliberately missing:
 ## Tests
 
 ```
-Test Files  4 passed (4)
-     Tests  57 passed (57)
+Test Files  5 passed (5)
+     Tests  61 passed (61)
 ```
 
 - `shared/rules.test.ts` — marker priority, bundle filter, approve/reject, duplicate and out-of-bundle refusal, immutability
 - `shared/seed.test.ts` — capacity = classrooms × 20, timestamps, fake-only contact data
 - `server/app.test.ts` — every route, error codes, broadcast events
+- `server/store.test.ts` — keeps a saved db.json, re-seeds one written by an older seed
 - `web/src/lib/i18n.test.ts` — English default, EN/KO key parity, daycare wording, error-code mapping
 
 Map data © OpenStreetMap contributors (ODbL).
