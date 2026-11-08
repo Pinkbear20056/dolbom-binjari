@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
+import { useEffect, useMemo } from 'react';
+import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap } from 'react-leaflet';
+import { latLngBounds, type LatLngBoundsExpression } from 'leaflet';
 import type { School } from '../../../shared/types';
 import { markerState, vacancy, type MarkerColor } from '../../../shared/rules';
 
@@ -20,6 +21,23 @@ interface SchoolMapProps {
 
 const DEFAULT_CENTER: [number, number] = [37.725, 126.75];
 
+/** Re-fits the view whenever the set of located schools changes. */
+function FitBounds({ points }: { points: Array<[number, number]> }) {
+  const map = useMap();
+  const key = points.map((p) => p.join(',')).join('|');
+  useEffect(() => {
+    if (points.length === 0) return;
+    if (points.length === 1) {
+      map.setView(points[0], 14);
+      return;
+    }
+    const bounds: LatLngBoundsExpression = latLngBounds(points);
+    map.fitBounds(bounds, { padding: [48, 48], maxZoom: 15 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- key summarises points
+  }, [map, key]);
+  return null;
+}
+
 export default function SchoolMap({ schools, homeSchoolId, selectedId, now, onSelect }: SchoolMapProps) {
   const located = useMemo(() => schools.filter((s) => s.lat !== null && s.lng !== null), [schools]);
   const center = useMemo<[number, number]>(() => {
@@ -29,11 +47,13 @@ export default function SchoolMap({ schools, homeSchoolId, selectedId, now, onSe
     return [lat, lng];
   }, [located]);
 
+  const points = useMemo<Array<[number, number]>>(() => located.map((s) => [s.lat as number, s.lng as number]), [located]);
   const missing = schools.length - located.length;
 
   return (
     <div className="map-wrap">
       <MapContainer center={center} zoom={13} scrollWheelZoom={false} className="map" aria-label="묶음 안 학교 지도">
+        <FitBounds points={points} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
